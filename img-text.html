@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Image Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        #textInput {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #imageContainer {
+            margin-top: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text to Image Generator</h1>
+    <form id="textForm">
+        <input type="text" id="textInput" placeholder="Enter text here (e.g., 'A cat on a skateboard')" required>
+        <button type="submit">Generate Image</button>
+    </form>
+    <div id="imageContainer">
+        <!-- Generated image will appear here -->
+    </div>
+
+    <script>
+        document.getElementById('textForm').addEventListener('submit', async function(event) {
+            event.preventDefault();  // Prevent form submission
+            const text = document.getElementById('textInput').value;
+
+            // Call the backend API to generate an image
+            try {
+                const response = await fetch('http://127.0.0.1:5000/generate-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text }),
+                });
+
+                const data = await response.json();
+
+                if (data.image_url) {
+                    // Display the generated image
+                    const imageContainer = document.getElementById('imageContainer');
+                    imageContainer.innerHTML = `<img src="${data.image_url}" alt="Generated Image">`;
+                } else if (data.error) {
+                    // Display error message
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                alert('An error occurred while generating the image. Please try again.');
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>
